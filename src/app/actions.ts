@@ -1,27 +1,34 @@
 "use server";
 
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { otpStore } from "@/lib/otp-store";
 
-// Use the API key provided by the user
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Use the credentials provided in the environment
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 export async function sendOtp(email: string) {
   try {
     // Generate a 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
+    const normalizedEmail = email.toLowerCase();
     // Store the OTP with a 10-minute expiration
-    otpStore.set(email, {
+    otpStore.set(normalizedEmail, {
       otp,
       expiresAt: Date.now() + 10 * 60 * 1000,
     });
 
     console.log(`Sending OTP ${otp} to ${email}`);
 
-    // Send the email using Resend
-    const { error } = await resend.emails.send({
-      from: "onboarding@resend.dev",
+    // Send the email using Nodemailer
+    await transporter.sendMail({
+      from: `"Extroverts" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Your Extroverts Verification Code",
       html: `
@@ -36,11 +43,6 @@ export async function sendOtp(email: string) {
         </div>
       `,
     });
-
-    if (error) {
-      console.error("Resend error:", error);
-      return { success: false, error: "Failed to send email. Please try again." };
-    }
 
     return { success: true };
   } catch (error) {

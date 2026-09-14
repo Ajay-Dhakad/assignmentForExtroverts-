@@ -11,22 +11,29 @@ const handler = NextAuth({
         otp: { label: "OTP", type: "text" },
       },
       async authorize(credentials) {
+        console.log("Authorize called with:", credentials);
         if (!credentials?.email || !credentials?.otp) {
+          console.log("Missing credentials");
           return null;
         }
 
-        const storedData = otpStore.get(credentials.email);
+        const email = credentials.email.toLowerCase();
+        const storedData = otpStore.get(email);
+        console.log("Stored data for", email, ":", storedData);
 
         if (!storedData) {
+          console.log("No stored data found");
           return null;
         }
 
         if (Date.now() > storedData.expiresAt) {
-          otpStore.delete(credentials.email);
+          console.log("OTP expired");
+          otpStore.delete(email);
           return null;
         }
 
         if (storedData.otp !== credentials.otp) {
+          console.log("OTP mismatch. Expected:", storedData.otp, "Got:", credentials.otp);
           return null;
         }
 
