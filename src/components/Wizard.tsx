@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { signIn } from "next-auth/react";
 import { sendOtp } from "@/app/actions";
 import { Loader2, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
-
-const steps = ["Landing", "Email", "OTP", "Profile", "Location", "Success"];
 
 export default function Wizard() {
   const [step, setStep] = useState(0);
@@ -129,6 +127,7 @@ export default function Wizard() {
         {step === 0 && (
           <motion.div key="step0" variants={slideVariants} initial="initial" animate="animate" exit="exit" className="text-center">
             <div className="flex justify-center mb-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo.png" alt="Extroverts Logo" className="h-20 w-auto object-contain rounded-xl" />
             </div>
             <h1 className="text-4xl font-bold text-white mb-6">
@@ -147,8 +146,8 @@ export default function Wizard() {
         {step === 1 && (
           <motion.div key="step1" variants={slideVariants} initial="initial" animate="animate" exit="exit">
             <button onClick={prevStep} className="text-neutral-400 hover:text-white mb-6 flex items-center gap-1 text-sm"><ArrowLeft size={16} /> Back</button>
-            <h2 className="text-2xl font-semibold mb-2">What's your email?</h2>
-            <p className="text-neutral-400 text-sm mb-6">We'll send you a verification code.</p>
+            <h2 className="text-2xl font-semibold mb-2">What&apos;s your email?</h2>
+            <p className="text-neutral-400 text-sm mb-6">We&apos;ll send you a verification code.</p>
             <form onSubmit={handleSendOtp}>
               <input
                 type="email"
@@ -311,7 +310,7 @@ export default function Wizard() {
             >
               <CheckCircle2 size={40} />
             </motion.div>
-            <h2 className="text-3xl font-bold mb-4">You're All Set!</h2>
+            <h2 className="text-3xl font-bold mb-4">You&apos;re All Set!</h2>
             <p className="text-neutral-400 mb-8">Your profile has been created successfully. Welcome to the Extroverts community.</p>
             <button className="bg-gradient-to-r from-purple-600 to-orange-500 text-white font-semibold rounded-full py-3 px-8 hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(249,115,22,0.3)]">
               Go to Dashboard

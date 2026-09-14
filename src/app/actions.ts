@@ -20,7 +20,7 @@ export async function sendOtp(email: string) {
     console.log(`Sending OTP ${otp} to ${email}`);
 
     // Send the email using Resend
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: "onboarding@resend.dev",
       to: email,
       subject: "Your Extroverts Verification Code",
