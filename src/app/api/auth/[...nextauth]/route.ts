@@ -18,7 +18,7 @@ const handler = NextAuth({
         }
 
         const email = credentials.email.toLowerCase();
-        const storedData = otpStore.get(email);
+        const storedData = await otpStore.get(email);
         console.log("Stored data for", email, ":", storedData);
 
         if (!storedData) {
@@ -28,7 +28,7 @@ const handler = NextAuth({
 
         if (Date.now() > storedData.expiresAt) {
           console.log("OTP expired");
-          otpStore.delete(email);
+          await otpStore.delete(email);
           return null;
         }
 
@@ -38,7 +38,7 @@ const handler = NextAuth({
         }
 
         // OTP is valid, remove it
-        otpStore.delete(credentials.email);
+        await otpStore.delete(email);
 
         // Return a user object (we can use the email as id for now)
         return { id: credentials.email, email: credentials.email };

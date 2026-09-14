@@ -19,7 +19,7 @@ export async function sendOtp(email: string) {
 
     const normalizedEmail = email.toLowerCase();
     // Store the OTP with a 10-minute expiration
-    otpStore.set(normalizedEmail, {
+    await otpStore.set(normalizedEmail, {
       otp,
       expiresAt: Date.now() + 10 * 60 * 1000,
     });
