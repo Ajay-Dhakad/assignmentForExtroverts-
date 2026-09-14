@@ -5,9 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { signIn } from "next-auth/react";
 import { sendOtp } from "@/app/actions";
 import { Loader2, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { useOtp } from "@/context/OtpContext";
 
 export default function Wizard() {
   const [step, setStep] = useState(0);
+  const { expectedOtp, setOtpData, clearOtpData } = useOtp();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -36,7 +38,8 @@ export default function Wizard() {
     setLoading(true);
     const res = await sendOtp(email);
     setLoading(false);
-    if (res.success) {
+    if (res.success && res.otp) {
+      setOtpData(email, res.otp);
       nextStep();
     } else {
       setError(res.error || "Failed to send OTP");
@@ -51,20 +54,22 @@ export default function Wizard() {
       setError("Please enter the complete 6-digit OTP.");
       return;
     }
+
+    if (enteredOtp !== expectedOtp) {
+      setError("Invalid or expired OTP. Please try again.");
+      return;
+    }
+
     setLoading(true);
     const res = await signIn("credentials", {
       redirect: false,
       email,
-      otp: enteredOtp,
     });
     setLoading(false);
     if (res?.error) {
-      if (res.error === "CredentialsSignin") {
-        setError("Invalid or expired OTP. Please try again.");
-      } else {
-        setError(res.error);
-      }
+      setError(res.error);
     } else {
+      clearOtpData();
       nextStep();
     }
   };

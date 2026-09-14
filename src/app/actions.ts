@@ -1,7 +1,6 @@
 "use server";
 
 import nodemailer from "nodemailer";
-import { otpStore } from "@/lib/otp-store";
 
 // Use the credentials provided in the environment
 const transporter = nodemailer.createTransport({
@@ -18,11 +17,6 @@ export async function sendOtp(email: string) {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     const normalizedEmail = email.toLowerCase();
-    // Store the OTP with a 10-minute expiration
-    await otpStore.set(normalizedEmail, {
-      otp,
-      expiresAt: Date.now() + 10 * 60 * 1000,
-    });
 
     console.log(`Sending OTP ${otp} to ${email}`);
 
@@ -44,7 +38,7 @@ export async function sendOtp(email: string) {
       `,
     });
 
-    return { success: true };
+    return { success: true, otp };
   } catch (error) {
     console.error("Action error:", error);
     return { success: false, error: "An unexpected error occurred." };
